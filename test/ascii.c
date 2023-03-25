@@ -3,7 +3,8 @@
 
 int main()
 {
-    ReadChar();
+    for(int i=0; i<255; i++)
+    PrintChar(i);
     Halt();
     // return 0;
 }

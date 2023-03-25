@@ -24,13 +24,6 @@
 #include "copyright.h"
 #include "system.h"
 #include "syscall.h"
-// #include "synch.h"
-// #include "synchcons.h"
-
-#include "synchcons.h"
-#include "synch.h"
-
-SynchConsole* gSynchConsole;
 
 //----------------------------------------------------------------------
 // ExceptionHandler
@@ -211,12 +204,94 @@ ExceptionHandler(ExceptionType which)
                     // increasePC();
                     return;
                 }                
+                case SC_ReadInt:
+                {
+                    char* buff = new char[MaxBuffer + 1];
+                    int len = gSynchConsole->Read(buff, MaxBuffer);
+                    buff[len] = '\0';
+                    // kiem tra so am
+                    bool isNeg = false;
+                    if(buff[0] == '-') {
+                        buff[0] = '0';
+                        isNeg = true;
+                    }
+                    // kiem tra co phai la so
+                    for(int i = 0; i < len; i++) {
+                        if(buff[i] < '0' || buff[i] > '9') { // neu khong phai la so
+                            machine->WriteRegister(2, 0); // tra ve 0
+                            printf("\n Invalid input");
+                            DEBUG('a', "\n Invalid input");
+                            delete buff;
+                            increasePC();
+                            return;
+                        }
+                    }
+                    // chuyen ki tu thanh so
+                    int res = 0;
+                    for(int i = 0; i < len; i++)
+                        res = res * 10 + (buff[i] - '0');
+
+                    // neu la so am, * -1
+                    if(isNeg)
+                        res *= -1;
+
+                    machine->WriteRegister(2, res); // tra so nguyen doc duoc
+                    delete buff;
+                    increasePC();
+                    return;
+                }
+                case SC_PrintInt:
+                {
+                    int number = machine->ReadRegister(4);
+                    if(number == 0) {
+                        gSynchConsole->Write("0", 1);
+                        increasePC();
+                        return;
+                    }
+        
+                    bool isNeg = false;
+                    int firstIndex = 0;
+                    if(number < 0) {
+                        isNeg = true;
+                        firstIndex = 1;
+                        number = number * (-1);
+                    }
+        
+                    int temp = number;
+                    int count = 0;
+                    while(temp) {
+                        count++;
+                        temp /= 10;
+                    }
+        
+                    char* buff = new char[MaxBuffer];
+                    for(int i = firstIndex + count - 1; i >= firstIndex; i--)
+                    {
+                        buff[i] = (char)((number % 10) + '0');
+                        number /= 10;
+                    }
+                    if(isNeg == true)
+                    {
+                        buff[0] = '-';
+                        buff[count + 1] = '\0';
+                        gSynchConsole->Write(buff, count + 1);
+                    }
+                    else
+                    {
+                        buff[count] = '\0';
+                        gSynchConsole->Write(buff, count);
+                    }
+                    machine->WriteRegister(2, 0); // in so nguyen thanh cong
+        
+                    delete buff;
+                    increasePC();
+                    return;
+                }
                 case SC_ReadChar:
                 {
                     int maxByte = 255;
-                    char *buffer = new char [255];
-                    int numByte = gSynchConsole->Read(buffer, maxByte);
-
+                    char *buffer = new char [MaxBuffer+1];
+                    int numByte = gSynchConsole->Read(buffer, maxByte);                    
                     if(numByte>1) // nhiều hơn một kí tự
                     {
                         printf("\nInvalid - Number of character is greater than 1");
@@ -231,16 +306,22 @@ ExceptionHandler(ExceptionType which)
                     } else
                     // kí tự hợp lệ
                     {
-                        printf("\nSuccess");
+                        // printf("\nSuccess");
                         char c = buffer[0];
                         machine->WriteRegister(2,c); // ghi giá trị biến c tại thanh ghi 2
 
                     }
                     delete buffer;
                     // return;
-                    increasePC();
+                    // increasePC();
                     break;
                 }
+                case SC_PrintChar:
+                {
+                    char c = (char)machine->ReadRegister(4);
+                    gSynchConsole->Write(&c,1);
+                    break;
+                }               
                 default:
                 {
                     printf("\n Unexpected user mode exception (%d %d)", which, type);

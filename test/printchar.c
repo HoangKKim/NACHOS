@@ -3,7 +3,7 @@
 
 int main()
 {
-    ReadChar();
+    PrintChar('k');
     Halt();
     // return 0;
 }
