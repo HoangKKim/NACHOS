@@ -3,9 +3,19 @@
 
 int main()
 {
-    for(int i=0; i<255; i++)
-    PrintChar(i);
+    int i;
+    char c;
+    char space = ' ';
+    char line = '\n';
+    for(i=32; i<127; i++)
+    {
+        c= (char)(i);
+        PrintChar(c);
+        PrintChar(space);
+        if(i>0 && i%10==0)
+        {
+            PrintChar(line);
+        }
+    }
     Halt();
-    // aa
-    // return 0;
 }

@@ -35,7 +35,7 @@ CPP = gcc -E
 INCDIR =-I../userprog -I../threads
 CFLAGS = -G 0 -c $(INCDIR)
 
-all: halt shell matmult sort createfile readchar printchar test
+all: halt shell matmult sort createfile readchar printchar ascii
 	
 
 start.o: start.s ../userprog/syscall.h

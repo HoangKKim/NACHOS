@@ -51,14 +51,13 @@
 #define MaxFileLength 32
 #define MaxBuffer 256 
 
-void increasePC()
-{
-    int counter = machine->ReadRegister(PCReg);
-    machine->WriteRegister(PrevPCReg, counter);
-    counter = machine->ReadRegister(NextPCReg);
-    machine->WriteRegister(PCReg, counter);
-    machine->WriteRegister(NextPCReg, counter+4);
-
+void increasePC() {
+    // Compute next pc
+    int pcAfter = machine->ReadRegister(NextPCReg) + 4;
+    // Advance program counters.
+    machine->WriteRegister(PrevPCReg, machine->ReadRegister(PCReg));
+    machine->WriteRegister(PCReg, machine->ReadRegister(NextPCReg));
+    machine->WriteRegister(NextPCReg, pcAfter);
 }
 
 
