@@ -1,0 +1,10 @@
+#include "syscall.h"
+#include "copyright.h"
+#define maxlen 255
+int main()
+{
+    int i = 2;
+    i = ReadInt;
+    PrintInt(i);
+    Halt();
+}
