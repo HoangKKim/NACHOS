@@ -51,38 +51,41 @@
 #define MaxFileLength 32
 #define MaxBuffer 255
 
-char* User2System(int virtAddr,int limit)
+char *User2System(int virtAddr, int limit)
 {
-    int i;// index
+    int i; // index
     int oneChar;
-    char* kernelBuf = NULL;
-    kernelBuf = new char[limit +1];//need for terminal string
+    char *kernelBuf = NULL;
+    kernelBuf = new char[limit + 1]; // need for terminal string
     if (kernelBuf == NULL)
-    return kernelBuf;
-    memset(kernelBuf,0,limit+1);
-    //printf("\n Filename u2s:");
-    for (i = 0 ; i < limit ;i++)
+        return kernelBuf;
+    memset(kernelBuf, 0, limit + 1);
+    // printf("\n Filename u2s:");
+    for (i = 0; i < limit; i++)
     {
-        machine->ReadMem(virtAddr+i,1,&oneChar);
+        machine->ReadMem(virtAddr + i, 1, &oneChar);
         kernelBuf[i] = (char)oneChar;
-        //printf("%c",kernelBuf[i]);
+        // printf("%c",kernelBuf[i]);
         if (oneChar == 0)
-        break;
+            break;
     }
-return kernelBuf;
+    return kernelBuf;
 }
 
-int System2User(int virtAddr,int len,char* buffer)
-{   
-    if (len < 0) return -1;
-    if (len == 0)return len;
+int System2User(int virtAddr, int len, char *buffer)
+{
+    if (len < 0)
+        return -1;
+    if (len == 0)
+        return len;
     int i = 0;
-    int oneChar = 0 ;
-    do{
-        oneChar= (int) buffer[i];
-        machine->WriteMem(virtAddr+i,1,oneChar);
-        i ++;
-    }while(i < len && oneChar != 0);
+    int oneChar = 0;
+    do
+    {
+        oneChar = (int)buffer[i];
+        machine->WriteMem(virtAddr + i, 1, oneChar);
+        i++;
+    } while (i < len && oneChar != 0);
     return i;
 }
 
@@ -298,6 +301,30 @@ ExceptionHandler(ExceptionType which)
                 {
                     char c = (char)machine->ReadRegister(4);
                     gSynchConsole->Write(&c, 1);
+                    break;
+                }
+                case SC_ReadString:
+                {
+                    int buffAddr = machine->ReadRegister(4); // dia chi cua *buffer
+                    int maxLen = machine->ReadRegister(5); // 
+                    
+                    char *buffer = new char[maxLen + 1];
+                    int length = gSynchConsole->Read(buffer, maxLen); // tra ve do dai chuoi doc duoc
+                    buffer[length] = '\0';
+
+                    System2User(buffAddr, length + 1, buffer);
+                    delete buffer;
+                    break;
+                }
+                case SC_PrintString:
+                {
+                    int buffAddr = machine->ReadRegister(4);
+                    char* buffer = User2System(buffAddr, MaxBuffer);
+                    int length = 0;
+                    while(buffer[length] != '\0')
+                        length++;
+                    gSynchConsole->Write(buffer, length + 1);
+                    delete buffer;
                     break;
                 }
                 default:

@@ -17,7 +17,11 @@ int main()
     // {
     //     // printf("Success create file");
     // }
-    Create("text.txt");
+    // Create("text.txt");
+
+    // char s[1024] = "abcdes";
+    // ReadString(s, 3);
+    PrintString("abcdes");
     
     Halt();
 }
