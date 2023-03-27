@@ -48,7 +48,6 @@
 //	are in machine.h.
 //----------------------------------------------------------------------
 
-#define MaxFileLength 32
 #define MaxBuffer 255
 
 char *User2System(int virtAddr, int limit)
@@ -60,12 +59,10 @@ char *User2System(int virtAddr, int limit)
     if (kernelBuf == NULL)
         return kernelBuf;
     memset(kernelBuf, 0, limit + 1);
-    // printf("\n Filename u2s:");
     for (i = 0; i < limit; i++)
     {
         machine->ReadMem(virtAddr + i, 1, &oneChar);
         kernelBuf[i] = (char)oneChar;
-        // printf("%c",kernelBuf[i]);
         if (oneChar == 0)
             break;
     }
@@ -89,6 +86,7 @@ int System2User(int virtAddr, int len, char *buffer)
     return i;
 }
 
+// tang program counter
 void increasePC() {
     // Compute next pc
     int pcAfter = machine->ReadRegister(NextPCReg) + 4;
@@ -159,53 +157,17 @@ ExceptionHandler(ExceptionType which)
         {
             switch(type) {
                 case SC_Halt:
-                    {   
-                        DEBUG('a', "\nShutdown, initiated by user program.");
-                        printf ("\n\nShutdown, initiated by user program.");
-                        interrupt->Halt();
-                        return;
-                    }
-                case SC_Create:
                 {
-                    int virtAddr;
-                    char *filename;
-                    DEBUG('a',"\n SC_Create call ...");
-                    DEBUG('a', "\n Reading virtual addres of filename");
-                    // lấy tham số(tên tập tin) từ thanh ghi r4
-                    virtAddr = machine->ReadRegister(4);
-                    DEBUG('a',"\n Reading filename.");
-                    // MaxFileLength = 32
-                    // increasePC();
-                    filename = User2System(virtAddr,MaxFileLength + 1);
-                    if(filename == NULL)
-                    {
-                        printf("\n Not enough memory in system");
-                        DEBUG('a',"\n Not enough memory in system");
-                        machine->WriteRegister(2,-1); // tra ve loi cho chuong trinh nguoi dung
-                        delete filename;
-                        increasePC();
-                        return;
-                    }
-                    DEBUG('a',"\n Finish reading filename.");
-                    // DEBUG('a',"\n File name: "<<filename<<"");
-                    
-                    // Create file with size = 0
-                    if(!fileSystem->Create(filename,0))
-                    {
-                        printf("\n Error create file '%s'", filename);
-                        machine->WriteRegister(2,-1);
-                        delete filename;
-                        increasePC();
-                        return;
-                    }
-                    machine->WriteRegister(2,0); // trả về cho chương trình người dùng thành công
-                    delete filename;
-                    break;
-                }                
+                    DEBUG('a', "\nShutdown, initiated by user program.");
+                    printf("\n\nShutdown, initiated by user program.");
+                    interrupt->Halt();
+                    return;
+                }
                 case SC_ReadInt:
                 {
                     char* buff = new char[MaxBuffer + 1];
-                    int len = gSynchConsole->Read(buff, MaxBuffer);
+                    int len = gSynchConsole->Read(buff, MaxBuffer); // doc vao chuoi user nhap,
+                                                                    // tra ve so byte doc duoc
                     buff[len] = '\0';
 
                     // kiem tra so am
@@ -218,10 +180,10 @@ ExceptionHandler(ExceptionType which)
                     int res = 0; // ket qua so nguyen
                     for(int i = 0; i < len; i++) {
                         if(buff[i] < '0' || buff[i] > '9') { // neu khong phai la so
-                            printf("\nInvalid input.");
                             DEBUG('a', "\nInvalid input.");
-                            machine->WriteRegister(2, 0); // tra ve 0
+                            printf("\n Invalid input.");
                             delete buff;
+                            machine->WriteRegister(2, 0); // tra ve 0
                             increasePC();
                             return;
                         }
@@ -236,17 +198,17 @@ ExceptionHandler(ExceptionType which)
                 }
                 case SC_PrintInt:
                 {
-                    int number = machine->ReadRegister(4); // doc tham so truyen vao
+                    int number = machine->ReadRegister(4); // so nguyen duoc truyen vao
                     // neu la so 0
                     if(number == 0) {
-                        gSynchConsole->Write("0", 1);
+                        gSynchConsole->Write("0", 1); // xuat so 0
                         increasePC();
                         return;
                     }
 
                     char* buff = new char[MaxBuffer + 1]; // chuoi ki tu dung de in so nguyen
                     
-                    bool isNeg = false;
+                    bool isNeg = false; // bien kiem tra co phai la so am
                     if(number < 0) { // neu la so am
                         isNeg = true;
                         number *= -1; // chuyen thanh so duong
@@ -267,8 +229,8 @@ ExceptionHandler(ExceptionType which)
                     buff[len] = '\0';
 
                     if(isNeg) // neu la so am
-                        gSynchConsole->Write("-", 1); // xuat dau -
-                    gSynchConsole->Write(buff, len); // xuat ket qua ra man hinh console
+                        gSynchConsole->Write("-", 1); // xuat them dau -
+                    gSynchConsole->Write(buff, len + 1); // xuat ket qua ra man hinh console
 
                     delete buff;
                     break;
@@ -308,26 +270,25 @@ ExceptionHandler(ExceptionType which)
                 case SC_ReadString:
                 {
                     int buffAddr = machine->ReadRegister(4); // dia chi cua *buffer
-                    int maxLen = machine->ReadRegister(5); // 
+                    int maxLen = machine->ReadRegister(5); // do dai toi da cua chuoi
                     
                     char *buffer = new char[maxLen + 1];
-                    int length = gSynchConsole->Read(buffer, maxLen); // tra ve do dai chuoi doc duoc
-                    buffer[length] = '\0';
+                    int len = gSynchConsole->Read(buffer, maxLen);   // doc chuoi user nhap,
+                                                                        // tra ve do dai chuoi doc duoc
+                    buffer[len] = '\0';
 
-                    System2User(buffAddr, length + 1, buffer);
+                    System2User(buffAddr, len + 1, buffer);  // chuyen du lieu tu kernelspcae qua userspace
                     delete buffer;
-                    increasePC();
-                    return;
-                    // break;
+                    break;
                 }
                 case SC_PrintString:
                 {
-                    int buffAddr = machine->ReadRegister(4);
-                    char* buffer = User2System(buffAddr, MaxBuffer);
-                    int length = 0;
-                    while(buffer[length] != '\0')
-                        length++;
-                    gSynchConsole->Write(buffer, length + 1);
+                    int buffAddr = machine->ReadRegister(4);    // dia chi cua *buffer
+                    char* buffer = User2System(buffAddr, MaxBuffer);    // chuyen du lieu tu userspace qua kernelspcae 
+
+                    int len = strlen(buffer);
+
+                    gSynchConsole->Write(buffer, len + 1); // xuat chuoi ra console
                     delete buffer;
                     break;
                 }
@@ -339,6 +300,6 @@ ExceptionHandler(ExceptionType which)
                 }
             }
         }
-        increasePC();
+        increasePC(); // tang program counter
     }
 }
