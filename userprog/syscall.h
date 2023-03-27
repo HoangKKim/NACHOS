@@ -18,20 +18,20 @@
 /* system call codes -- used by the stubs to tell the kernel which system call
  * is being asked for
  */
-#define SC_Halt		0
-#define SC_Exit		1
-#define SC_Exec		2
-#define SC_Join		3
-#define SC_Create	4
-#define SC_Open		5
-#define SC_Read		6
-#define SC_Write	7
-#define SC_Close	8
-#define SC_Fork		9
-#define SC_Yield	10
-#define SC_ReadInt  11
-#define SC_PrintInt 12
-#define SC_ReadChar 13
+#define SC_Halt		    0
+#define SC_Exit		    1
+#define SC_Exec		    2
+#define SC_Join		    3
+#define SC_Create	    4
+#define SC_Open		    5
+#define SC_Read		    6
+#define SC_Write	    7
+#define SC_Close	    8
+#define SC_Fork		    9
+#define SC_Yield	    10
+#define SC_ReadInt      11
+#define SC_PrintInt     12
+#define SC_ReadChar     13
 #define SC_PrintChar    14
 #define SC_ReadString   15
 #define SC_PrintString  16
@@ -131,24 +131,25 @@ void Fork(void (*func)());
  */
 void Yield();		
 
-// Hàm đọc kí tự
+// Doc ki tu
 char ReadChar(); 
 
+// In ki tu
 void PrintChar(char c); 
 
+// Doc so nguyen
 int ReadInt();
 
+// In so nguyen
 void PrintInt(int n);
 
+// Doc chuoi
 void ReadString (char buffer[], int length);
 
+// In chuoi
 void PrintString (char buffer[]);
 
 
 #endif /* IN_ASM */
 
 #endif /* SYSCALL_H */
-
-
-
-

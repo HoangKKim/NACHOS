@@ -7,7 +7,7 @@
 int main()
 {
     char s[MaxLen];
-    ReadString(s, MaxLen);
-    PrintString(s);
+    ReadString(s, MaxLen); // doc chuoi tu console
+    PrintString(s); // in chuoi vua doc
     Halt();
 }

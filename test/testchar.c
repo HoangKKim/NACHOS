@@ -7,5 +7,4 @@ int main()
     c = ReadChar(); // đọc ký tự từ màn hình console
     PrintChar(c); // in ký tự vừa đọc được
     Halt();
-    // return 0;
 }
