@@ -19,9 +19,9 @@ int main()
     // }
     // Create("text.txt");
 
-    // char s[1024] = "abcdes";
-    // ReadString(s, 3);
-    PrintString("abcdes");
+    char s[1024]; // = "abcdes";
+    ReadString(s, 1024);
+    PrintString(s);
     
     Halt();
 }

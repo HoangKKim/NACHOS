@@ -314,7 +314,9 @@ ExceptionHandler(ExceptionType which)
 
                     System2User(buffAddr, length + 1, buffer);
                     delete buffer;
-                    break;
+                    increasePC();
+                    return;
+                    // break;
                 }
                 case SC_PrintString:
                 {
