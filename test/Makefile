@@ -35,7 +35,7 @@ CPP = gcc -E
 INCDIR =-I../userprog -I../threads
 CFLAGS = -G 0 -c $(INCDIR)
 
-all: halt shell matmult sort createfile readchar printchar testint ascii sort2 help teststring
+all: halt shell matmult sort createfile testchar testint ascii sort2 help teststring
 	
 
 start.o: start.s ../userprog/syscall.h
@@ -73,17 +73,11 @@ createfile: createfile.o start.o
 	$(LD) $(LDFLAGS) start.o createfile.o -o createfile.coff
 	../bin/coff2noff createfile.coff createfile
 
-readchar.o: readchar.c
-	$(CC) $(CFLAGS) -c readchar.c
-readchar: readchar.o start.o
-	$(LD) $(LDFLAGS) start.o readchar.o -o readchar.coff
-	../bin/coff2noff readchar.coff readchar
-
-printchar.o: printchar.c
-	$(CC) $(CFLAGS) -c printchar.c
-printchar: printchar.o start.o
-	$(LD) $(LDFLAGS) start.o printchar.o -o printchar.coff
-	../bin/coff2noff printchar.coff printchar
+testchar.o: testchar.c
+	$(CC) $(CFLAGS) -c testchar.c
+testchar: testchar.o start.o
+	$(LD) $(LDFLAGS) start.o testchar.o -o testchar.coff
+	../bin/coff2noff testchar.coff testchar
 
 ascii.o: ascii.c
 	$(CC) $(CFLAGS) -c ascii.c

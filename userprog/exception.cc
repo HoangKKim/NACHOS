@@ -160,8 +160,8 @@ ExceptionHandler(ExceptionType which)
             switch(type) {
                 case SC_Halt:
                     {   
-                        DEBUG('a', "\n Shutdown, initiated by user program.");
-                        printf ("\n\n Shutdown, initiated by user program.");
+                        DEBUG('a', "\nShutdown, initiated by user program.");
+                        printf ("\n\nShutdown, initiated by user program.");
                         interrupt->Halt();
                         return;
                     }
@@ -181,7 +181,7 @@ ExceptionHandler(ExceptionType which)
                     {
                         printf("\n Not enough memory in system");
                         DEBUG('a',"\n Not enough memory in system");
-                        machine->WriteRegister(2,-1); // trả về lỗi cho chương trình người dùng
+                        machine->WriteRegister(2,-1); // tra ve loi cho chuong trinh nguoi dung
                         delete filename;
                         increasePC();
                         return;
@@ -275,32 +275,34 @@ ExceptionHandler(ExceptionType which)
                 }
                 case SC_ReadChar:
                 {
-                    char *buffer = new char [MaxBuffer + 1];
-                    int numByte = gSynchConsole->Read(buffer, MaxBuffer);                    
-                    if(numByte > 1) // nhiều hơn một kí tự
+                    char *buff = new char [MaxBuffer + 1];
+                    int nBytes = gSynchConsole->Read(buff, MaxBuffer); // tra ve so luong byte ma nguoi dung su dung 
+
+                    // So ki tu nhap vao nhieu hon 1 - nhap chuoi
+                    if(nBytes > 1) 
                     {
                         printf("\nInvalid - Number of character is greater than 1");
                         DEBUG('a', "\nError: Number of character is greater than 1");
-                        machine->WriteRegister(2, 0);
+                        machine->WriteRegister(2, 0);  // tra ve 0 
                     } 
-                    else if(numByte == 0) // kí tự rỗng - null
+                    else if(nBytes == 0) // kí tự rỗng - null
                     {
                         printf("\nInvalid - It is a null character") ;
                         DEBUG('a',"\nError: It is a null character");
-                        machine->WriteRegister(2, 0);
+                        machine->WriteRegister(2, 0);  // tra ve 0
                     }
-                    else // kí tự hợp lệ
+                    else // ki tu hop le
                     {
-                        char c = *buffer;
-                        machine->WriteRegister(2, c); // ghi giá trị biến c tại thanh ghi 2
+                        char c = *buff; // ki tu doc duoc luu tai vi tri dau tien cua mang buff
+                        machine->WriteRegister(2, c); // tra gia tri ki tu doc duoc vao thanh ghi 2
                     }
-                    delete buffer;
+                    delete buff;
                     break;
                 }
                 case SC_PrintChar:
                 {
-                    char c = (char)machine->ReadRegister(4);
-                    gSynchConsole->Write(&c, 1);
+                    char c = (char)machine->ReadRegister(4); // lay gia tri tai thanh ghi 4
+                    gSynchConsole->Write(&c, 1); // in ra man hinh console gia tri cua c, kich thuoc 1Byte
                     break;
                 }
                 case SC_ReadString:
@@ -314,7 +316,9 @@ ExceptionHandler(ExceptionType which)
 
                     System2User(buffAddr, length + 1, buffer);
                     delete buffer;
-                    break;
+                    increasePC();
+                    return;
+                    // break;
                 }
                 case SC_PrintString:
                 {
