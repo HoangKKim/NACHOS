@@ -13,7 +13,7 @@ int main()
 	PrintString("\n\tINSTRUCTIONS\n");
 	PrintString("ASCII Program:\n");
 	PrintString("Print the ASCII table\n");
-	PrintString("Run .userprog/nachos -rs 1023 -x ./test/ASCII\n");
+	PrintString("Run .userprog/nachos -rs 1023 -x ./test/ascii\n");
 
 	PrintString("Bublle sort Program:\n");
 	PrintString("Enter number of elements than enter number for each element\n");
