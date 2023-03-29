@@ -135,7 +135,7 @@ void Yield();
 char ReadChar(); 
 
 // In ki tu
-void PrintChar(char c); 
+void PrintChar(char character); 
 
 // Doc so nguyen
 int ReadInt();
