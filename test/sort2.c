@@ -15,6 +15,10 @@ int main()
         PrintString("Max size is 100\n");
         Halt();
     }
+    if(n < 0) {
+        PrintString("Invalid\n");
+        Halt();
+    }
 
     // nhap mang
     PrintString("Enter each value:\n");
