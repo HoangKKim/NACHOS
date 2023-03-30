@@ -243,14 +243,14 @@ ExceptionHandler(ExceptionType which)
                     // So ki tu nhap vao nhieu hon 1 - nhap chuoi
                     if(nBytes > 1) 
                     {
-                        printf("\nInvalid - Number of character is greater than 1");
-                        DEBUG('a', "\nError: Number of character is greater than 1");
+                        printf("\nInvalid - Number of characters is greater than 1");
+                        DEBUG('a', "\nError: Number of characters is greater than 1");
                         machine->WriteRegister(2, 0);  // tra ve 0 
                     } 
                     else if(nBytes == 0) // kí tự rỗng - null
                     {
-                        printf("\nInvalid - It is a null character") ;
-                        DEBUG('a',"\nError: It is a null character");
+                        printf("\nInvalid - Don't have any character") ;
+                        DEBUG('a',"\nError: Don't have any character");
                         machine->WriteRegister(2, 0);  // tra ve 0
                     }
                     else // ki tu hop le
